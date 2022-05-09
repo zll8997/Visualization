@@ -1,0 +1,102 @@
+<!-- 画城市群边界的那个直线代码 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <title>MapVGL</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #map_container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+  </style>
+  <script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=z0Cg46TcAmhdnVrWLskZ9zhII8fpReIk"></script>
+  <script src="//mapv.baidu.com/build/mapv.min.js"></script>
+  <script src="common.js"></script>
+  <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.125/dist/mapvgl.min.js"></script>
+  <script src="tools.js"></script>
+</head>
+
+<body>
+  <div id="map_container"></div>
+  <script>
+    /* global BMapGL */
+
+    /* global mapv */
+
+    /* global mapvgl */
+
+    /* global initMap */
+
+    /* global whiteStyle */
+
+    /* global purpleStyle */
+    var map = initMap({
+      tilt: 20,
+      heading: 0,
+      center: [106.526814, 29.526265],
+      zoom: 5,
+      style: purpleStyle
+    })
+
+    var view = new mapvgl.View({
+      // effects: [new mapvgl.BloomEffect()],
+      map: map
+    })
+
+    let data = []
+    ajaxPost('https://www.lexue.ltd/urban/getDayData/2013-01-01', '', temp1)
+
+    function temp1(res) {
+      console.log(res);
+      for (let i = 0; i < res.length; i++) {
+        let obj = { geometry: {} }
+        obj.geometry.type = 'LineString'
+        obj.geometry.coordinates = []
+        let arr = res[i].urbanAgglomerationMonitoringDataList;
+        // console.log(arr)
+        for (let j = 0; j < arr.length; j++) {
+          let temp = [arr[j].lon, arr[j].lat];
+          obj.geometry.coordinates.push(temp)
+        }
+        data.push(obj)
+      }
+
+      console.log(data)
+      var layer = new mapvgl.SimpleLineLayer({
+        blend: 'lighter',
+        color: 'rgba(241,204,84,0.8)'
+      });
+      layer.setData(data);
+      view.addLayer(layer);
+    }
+
+  // fetch('./static/car.csv').then(rs => {
+  //   return rs.text();
+  // }).then(csvstr => {
+  //   var dataSet = mapv.csv.getDataSet(csvstr);
+  //   var data = dataSet.get();
+  //
+  //   var layer = new mapvgl.SimpleLineLayer({
+  //     blend: 'lighter',
+  //     color: 'rgba(255, 71, 26, 0.8)'
+  //   });
+  //   layer.setData(data);
+  //   view.addLayer(layer);
+  // });
+  </script>
+</body>
+
+</html>

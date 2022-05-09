@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="echarts.min.js"></script>
+</head>
+
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 600px;height:400px;"></div>
+
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            //color可以设置线条的颜色，注意后面是个数组
+            color: ['pink', 'red', 'green', 'blue'],
+            //设置图标标题
+            title: {
+                text: '长沙市全年空气污染情况'
+            },
+            //图标的提示框组件
+            tooltip: {
+                //触发方式-坐标轴触发，即鼠标放到坐标图上就显示，官网有其他方式的说明（配置项手册）
+                trigger: 'axis'
+            },
+            //图例组件，series里面有了name值则legend里面的data可以删除掉
+            legend: {
+                //data: ['沙坪', '伍家岭', '经开区环保局', '高开区环保局', '马坡岭']
+            },
+            //网格配置，控制线形图 柱状图 图表大小，与dom盒子大小不一样
+            grid: {
+                left: '5%',
+                right: '4%',
+                bottom: '10%',
+                containLabel: true  //是否显示刻度标签，true就显示
+            },
+            //工具箱组件，可以另存为图片等功能，即下载按钮
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            //设置X轴的相关配置
+            xAxis: {
+                type: 'category',   //坐标轴显示的类型，category为类目型，value为键值型
+                boundaryGap: false,  //是否让线条与坐标轴有间隙，即是不是从原点开始画图
+                data: ['6/1 0:00', '6/1 1:00', '6/1 2:00', '6/1 3:00', '6/1 4:00', '6/1 5:00', '6/1 6:00', '6/1 7:00']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            //系列图表配置 决定显示哪种类型的图表,几个数组就代表显示几条线
+            series: [
+                {
+                    name: '沙坪',
+                    type: 'line', //表示类型，可以是线条，也可以是柱形图
+                    // stack: '总量', //数据堆叠，同个类目轴上系列配置相同的'stack'值后，后一个系列的值会在前一个系列的值上相加
+                    data: [55, 57, 58, 59, 62, 63, 62, 23]
+                },
+                {
+                    name: '伍家岭',
+                    type: 'line',
+                    //stack: '总量',
+                    data: [78, 79, 50, 33, 36, 39, 42]
+                },
+                {
+                    name: '经开区环保局',
+                    type: 'line',
+                    //stack: '总量',
+                    data: [0, 57, 58, 58, 57, 57, 54]
+                },
+                {
+                    name: '高开区环保局',
+                    type: 'line',
+                    //stack: '总量',
+                    data: [0, 62, 59, 60, 62, 62, 62]
+                },
+                {
+                    name: '马坡岭',
+                    type: 'line',
+                    //stack: '总量',
+                    data: [0, 55, 58, 57, 58, 57, 55]
+                }
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+</body>
+
+</html>

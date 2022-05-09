@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- meta适应页面移动 -->
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Hello, World</title>
+    <!-- 设置容器样式大小，使地图充满整个浏览器窗口 -->
+    <style type="text/css">
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+
+        #container {
+            height: 100%
+        }
+    </style>
+    <!-- 引用百度API文件 -->
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=6nsgRGcu2Nz3qiG4c8mjZ9N7ng6EbNac">
+    //v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+    </script>
+</head>
+
+<body>
+    <!-- 创建容器 -->
+    <div id="container"></div>
+    <script type="text/javascript">
+        // 创建地图实例 
+        var map = new BMap.Map("container");
+        // 创建点坐标，设置中心点坐标
+        var point = new BMap.Point(116.404, 39.915);
+        // 初始化地图，设置中心点坐标和地图级别   
+        map.centerAndZoom(point, 15);
+        map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+
+// var traffic = new BMap.TrafficLayer();        // 创建交通流量图层实例      
+// map.addTileLayer(traffic);                    // 将图层添加到地图上
+// map.removeTileLayer(traffic);                // 将图层移除
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+  </head>
+  <body style="background: url(img/background.png) no-repeat;padding: 0;margin: 0;">
+    <div id="main" style="width: 100%;"></div>
+    <script type="text/javascript" src="js/echarts.js"></script>
+    <script type="text/javascript" src="js/china.js"></script>
+    <script type="text/javascript">
+      document.getElementById("main").style.height = window.innerHeight + 'px';
+      var myChart = echarts.init(document.getElementById('main'));
+      var optionMap = {
+        title: {
+          text: "销量分省统计表",
+          x: "center",
+          textStyle: {
+            color: "#fff"
+          }
+        },
+        tooltip: {
+          trigger: "item",
+          textStyle: {
+            color: "#fff"
+          }
+        },
+        dataRange: {
+          min: 0,
+          max: 1000,
+          x: "left",
+          y: "bottom",
+          text: ["高", "低"],
+          calculable: !0,
+          inRange: {
+            color: ['lightskyblue', 'yellow', 'red']
+          },
+          textStyle: {
+            color: "#fff"
+          }
+        },
+        roamController: {
+          show: !0,
+          x: "right",
+          mapTypeControl: {
+            china: !0
+          }
+        },
+        roam: true,
+        series: [{
+          "name": "暂无数据",
+          "type": "map",
+          "mapType": "china",
+          "zoom": 1.2, //地图默认缩放比例
+          "itemStyle": {
+            "normal": {
+              "label": {
+                "show": true
+              }
+            },
+            "emphasis": {
+              "label": {
+                "show": true
+              }
+            }
+          },
+          "data": [{
+            "name": "广东省",
+            "value": 0
+          }]
+        }]
+      };
+      myChart.setOption(optionMap);
+    </script>
+  </body>
+</html>

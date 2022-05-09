@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body,
+		html,
+		/* 创建一个allmap盒子 */
+		#allmap {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			margin: 0;
+			font-family: "微软雅黑";
+		}
+
+		html,
+		body {
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			background: #ffffff;
+		}
+
+		#panel {
+			position: absolute;
+			top: 30px;
+			left: 10px;
+			z-index: 999;
+			color: #fff;
+		}
+
+		#login {
+			position: absolute;
+			width: 300px;
+			height: 40px;
+			left: 50%;
+			top: 50%;
+			margin: -40px 0 0 -150px;
+		}
+
+		#login input[type=password] {
+			width: 200px;
+			height: 30px;
+			padding: 3px;
+			line-height: 30px;
+			border: 1px solid #000;
+		}
+
+		#login input[type=submit] {
+			width: 80px;
+			height: 38px;
+			display: inline-block;
+			line-height: 38px;
+		}
+	</style>
+	<script type="text/javascript"
+		src="http://api.map.baidu.com/api?v=2.0&ak=6nsgRGcu2Nz3qiG4c8mjZ9N7ng6EbNac"></script>
+	<title>车路线+急加减速点</title>
+</head>
+
+<body>
+	<div id="allmap"></div>
+</body>
+
+</html>
+<script type="text/javascript">
+	//读取文件函数
+	function load(filename) {
+		let xhr = new XMLHttpRequest(),
+			okStatus = document.location.protocol === "file:" ? 0 : 200;
+		xhr.open('GET', filename, false);
+		xhr.overrideMimeType("text/html;charset=utf-8");//默认为utf-8
+		xhr.send(null);
+		return xhr.status === okStatus ? xhr.responseText : null;
+	}
+
+	//解析文件数据函数
+	function formatting(text) {
+		text = text.split('\n');
+		window.text = text;
+		var arr = [];
+		for (var i = 0; i < text.length - 1; i++) {
+			if (i === 0) {
+				continue;
+			}
+			var _ele = text[i].split(',');
+			arr.push({ x: _ele[1], y: _ele[0] });
+		}
+		return arr;
+	}
+
+	//地图上添加点函数
+	function plotpoints(ar, map, colo, siz) {
+		var points = [];
+		for (var i in ar) {
+			var _data = new BMap.Point(ar[i].x, ar[i].y);//点的经纬度
+			points.push(_data);
+		}
+		if (document.createElement('canvas').getContext) {  // 判断当前浏览器是否支持绘制海量点
+			var options = {
+				size: siz,
+				shape: BMAP_POINT_SHAPE_CIRCLE,
+				color: colo
+			}
+			var pointCollection = new BMap.PointCollection(points, options);  // 初始化PointCollection
+			pointCollection.addEventListener('click', function (e) {
+				alert('单击点的坐标为：' + e.point.lng + ',' + e.point.lat);  // 监听点击事件，弹窗弹出的提示框
+			});
+			map.addOverlay(pointCollection);  // 添加Overlay，点图标
+		} else {
+			alert('请在chrome、safari、IE8+以上浏览器查看本示例');
+		}
+	}
+
+	//数据文件
+	let text = load("string1.txt");
+	var arr = formatting(text);
+	let text1 = load("rapidly_acc_points1.txt");//急加速点
+	var arr1 = formatting(text1);
+	let text2 = load("sharp_slow_points1.txt");//急减速点
+	var arr2 = formatting(text2);
+	mapLoad(arr, arr1, arr2);
+	function mapLoad(arr, arr1, arr2) {
+		var pois = [];
+		for (var i in arr) {
+			var _data = new BMap.Point(arr[i].x, arr[i].y);
+			pois.push(_data);
+		}
+
+		// 百度地图API功能
+		var map = new BMap.Map("allmap");    // 创建Map实例
+		var view = map.getViewport(eval(pois));
+		var mapZoom = view.zoom;
+		var centerPoint = view.center;
+		map.centerAndZoom(centerPoint, mapZoom);// 初始化地图,设置中心点坐标和地图级别
+
+		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+		var sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+			scale: 0.6,//图标缩放大小
+			strokeColor: '#fff',//设置矢量图标的线填充颜色
+			strokeWeight: '3',//设置线宽
+		});
+		var icons = new BMap.IconSequence(sy, '100', '1000');
+
+		// // 创建polyline对象,画线
+		// var polyline = new BMap.Polyline(pois, {
+		// 	enableEditing: false,//是否启用线编辑，默认为false
+		// 	enableClicking: true,//是否响应点击事件，默认为true
+		// 	// icons:[icons], //折线上的白色箭头
+		// 	strokeWeight: '4',//折线的宽度，以像素为单位
+		// 	strokeOpacity: 0.6,//折线的透明度，取值范围0 - 1
+		// 	strokeColor: "#18a45b" //折线颜色
+		// });
+
+		// map.addOverlay(polyline);  //增加折线
+
+		plotpoints(arr1, map, '#DB7093', BMAP_POINT_SIZE_SMALL);//红点急加速点
+		plotpoints(arr2, map, '#6495ED', BMAP_POINT_SIZE_SMALL);//蓝点减速点
+		//点大小参数：BMAP_POINT_SIZE_SMALLER ，BMAP_POINT_SIZE_NORMAL ，BMAP_POINT_SIZE_BIG   		
+	}
+</script>

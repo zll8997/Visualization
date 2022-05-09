@@ -1,0 +1,188 @@
+<!-- 展示城市群地图 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <title>MapVGL</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #map_container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+  </style>
+  <script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=z0Cg46TcAmhdnVrWLskZ9zhII8fpReIk"></script>
+  <script src="common.js"></script>
+  <script src="//mapv.baidu.com/build/mapv.min.js"></script>
+  <script src="https://code.bdstatic.com/npm/mapvgl@1.0.0-beta.125/dist/mapvgl.min.js"></script>
+  <script src="tools.js"></script>
+</head>
+
+<body>
+  <div id="map_container"></div>
+  <script>
+    /* global BMapGL */
+
+    /* global mapv */
+
+    /* global mapvgl */
+
+    /* global initMap */
+
+    /* global whiteStyle */
+
+    var map = initMap({
+      style: whiteStyle,
+      skyColors: [
+        // 地面颜色
+        'rgba(226, 237, 248, 0)',
+        // 天空颜色
+        'rgba(186, 211, 252, 1)'
+      ]
+    })
+
+    var point = new BMapGL.Point(105.403119, 38.028658)
+    map.centerAndZoom(point, 5)
+
+    var data = []
+
+    var citys = [
+      '北京', '天津', '上海', '重庆', '石家庄', '太原', '呼和浩特', '哈尔滨',
+      '长春', '沈阳', '济南', '南京', '合肥', '杭州', '南昌', '福州', '郑州',
+      '武汉', '长沙', '广州', '南宁', '西安', '银川', '兰州', '西宁', '乌鲁木齐',
+      '成都', '贵阳', '昆明', '拉萨', '海口'
+    ]
+
+    var randomCount = 300
+
+    //构造数据
+
+    // while (randomCount--) {
+    //   var cityCenter = mapv.utilCityCenter.getCenterByCityName(citys[parseInt(Math.random() * citys.length, 10)])
+    //   data.push({
+    //     geometry: {
+    //       type: 'Point',
+    //       coordinates: [cityCenter.lng - 2 + Math.random() * 4, cityCenter.lat - 2 + Math.random() * 4]
+    //     },
+    //     properties: {
+    //       count: parseInt(4 * Math.random(), 10)
+    //     }
+    //   })
+    // }
+    // console.log(data)
+
+
+
+
+    ajaxPost('https://www.lexue.ltd/urban/getDayData/2013-01-01', '', temp1)
+
+    function temp1(res) {
+      console.log(res);
+      for (let i = 0; i < res.length; i++) {
+        let arr = res[i].urbanAgglomerationMonitoringDataList
+        for (let j = 0; j < arr.length; j++) {
+          data.push({
+            geometry: {
+              type: 'Point',
+              coordinates: [arr[j].lon, arr[j].lat]
+            },
+            properties: {
+              count: i
+            }
+          })
+        }
+      }
+      console.log(data);
+    }
+    // data.push({
+    //   geometry: {
+    //     type: 'Point',
+    //     coordinates: [116.403748, 39.915055]
+    //   },
+    //   properties: {
+    //     count: parseInt(0)
+    //   }
+    // })
+    // data.push({
+    //   geometry: {
+    //     type: 'Point',
+    //     coordinates: [116.403748, 39.8]
+    //   },
+    //   properties: {
+    //     count: parseInt(1)
+    //   }
+    // })
+    console.log(data);
+
+    var view = new mapvgl.View({
+      map: map
+    })
+
+    var pointLayer = new mapvgl.PointLayer({
+      blend: 'lighter',
+      size: 10,
+      color: function (item) {
+        if (item.properties.count === 0) {
+          return 'rgba(252,6,5,0.8)';
+        }
+        else if (item.properties.count === 1) {
+          return 'rgba(16,16,16,0.8)'
+        } else if (item.properties.count === 2) {
+          return 'rgb(211, 139, 93, 0.8)'
+        } else if (item.properties.count === 3) {
+          return 'rgb(44, 85, 48, 0.8)'
+        } else if (item.properties.count === 4) {
+          return 'rgb(115, 158, 130, 0.8)'
+        } else if (item.properties.count === 5) {
+          return 'rgba(24,21,20,0.8)'
+        } else if (item.properties.count === 6) {
+          return 'rgba(83,220,131,0.8)'
+        } else if (item.properties.count === 7) {
+          return 'rgba(34,229,174,0.8)'
+        } else if (item.properties.count === 8) {
+          return 'rgba(44,64,186,0.8)'
+        } else if (item.properties.count === 9) {
+          return 'rgba(0,62,250,0.8)'
+        } else if (item.properties.count === 10) {
+          return 'rgba(234,197,10,0.8)'
+        } else if (item.properties.count === 11) {
+          return 'rgba(109,10,12,0.8)'
+        } else if (item.properties.count === 12) {
+          return 'rgba(227,132,54,0.8)'
+        } else if (item.properties.count === 13) {
+          return 'rgba(245,175,166,0.8)'
+        } else if (item.properties.count === 14) {
+          return 'rgba(18,71,68,0.8)'
+        } else if (item.properties.count === 15) {
+          return 'rgba(164,175,220,0.8)'
+        } else if (item.properties.count === 16) {
+          return 'rgba(156,77,243,0.8)'
+        } else if (item.properties.count === 17) {
+          return 'rgba(102,0,255,0.8)'
+        } else if (item.properties.count === 18) {
+          return 'rgba(234,34,93,0.8)'
+        } else if (item.properties.count === 19) {
+          return 'rgba(2,42,23,0.62)'
+        }
+      }
+    })
+
+    view.addLayer(pointLayer)
+    pointLayer.setData(data)
+
+
+  </script>
+</body>
+
+</html>

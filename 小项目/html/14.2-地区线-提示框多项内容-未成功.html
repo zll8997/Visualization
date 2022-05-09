@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+
+<head>
+    <meta charset="utf-8">
+    <title>14年长沙6月1~30日空气污染情况</title>
+    <!--<script src="E:\ECharts\echarts.min.js"></script>-->
+    <!-- 引入 echarts.js -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+
+<body style="height: 100%; margin: 0">
+    <div>
+        <!-- 载入文件按钮 this就是我们的文件-->
+        <input type="file" id="file" accept=".json" onchange="upload(this)">
+    </div>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="container" style="height: 100%"></div>
+
+    <!-- 变量声明 -->
+    <script type="text/javascript">
+        var jsonObj;
+        var Jiancezhan = [];
+        var Major_pollutant = [];
+        var Air_class = [];
+        var Time = [];
+        var container = {//定义container数组，用来存放转换的js对象
+            AQI: [],
+            SO2: [],
+            NO2: [],
+            CO: [],
+            O3: [],
+            PM2_5: [],
+            PM10: [],
+            // flow: [],
+            // PO1: [],
+            // PO2: [],
+            // SG: [],
+            // BG: [],
+            // ER2: [],
+            // BG_position: [],
+            // SG_position: []
+        };
+        //定义header数组用来存放文字说明
+        // var header = {
+        //     BC1: '闸缸1(BC1)',
+        //     BC2: '闸缸2(BC2)',
+        //     MR: '总风(MR)',
+        //     BP: '列车管压力(BP)',
+        //     ER: '均缸压力(ER)',
+        //     PC: '预控压力(PC)',
+        //     AR: '作用压力(AR)',
+        //     flow: '流量(flow)',
+        //     PO1: 'PO1',
+        //     PO2: 'PO2',
+        //     SG: '小闸(SG)',
+        //     BG: '大闸(BG)',
+        //     ER2: '均缸2(ER2)',
+        //     BG_position: '大闸位置',
+        //     SG_position: '小闸位置'
+        // };
+
+        // 载入文件函数
+        function upload(event) {
+            var reader = new FileReader();
+            reader.onload = function () {    //载入数据
+                // JSON 通常用于与服务端交换数据。
+                // 在接收服务器数据时一般是字符串。
+                // 我们可以使用 JSON.parse() 方法将数据转换为 JavaScript 对象。
+                jsonObj = JSON.parse(this.result); //将数据转换为js对象存放到jsonObj中，this.result就是我们的json数据
+                formatContainer();
+                draw();
+            }
+            reader.readAsText(event.files[0]);//读取文件
+        }
+
+        function formatContainer() {
+            for (let index = 0; index < jsonObj.length; index++) {
+                //将转换后的js对象放入到定义的container数组中
+                container.AQI.push(jsonObj[index].AQI);
+                container.SO2.push(jsonObj[index].SO2);
+                container.NO2.push(jsonObj[index].NO2);
+                container.CO.push(jsonObj[index].CO);
+                container.O3.push(jsonObj[index].O3);
+                container.PM2_5.push(jsonObj[index].PM2_5);
+                container.PM10.push(jsonObj[index].PM10);
+
+                Time.push(jsonObj[index].监测时间);//时间数据
+                Jiancezhan.push(jsonObj[index].监测站);
+                Major_pollutant.push(jsonObj[index].首要污染物);
+                Air_class.push(jsonObj[index].空气质量类别);
+            }
+        }
+        var schema = [
+            { name: 'date', index: 0, text: '日' },
+            { name: 'AQI', index: 1, text: 'AQI指数' },
+            { name: 'SO2', index: 2, text: 'SO2' },
+            { name: 'NO2', index: 3, text: 'NO2' },
+            { name: 'CO', index: 4, text: 'CO' },
+            { name: 'O3', index: 5, text: 'O3' },
+            { name: 'PM2_5', index: 6, text: 'PM2_5' },
+            { name: 'PM10', index: 7, text: 'PM10' }
+        ];
+
+
+        //画图函数 
+        function draw() {
+            // 基于准备好的dom，初始化echarts实例
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+
+            var option = null;
+            option = {
+                title: {
+                    //text: '大闸常用制动（350-500kPa）',
+                    //text: '小闸单独制动（0-290kPa）',
+                    text: '14年长沙6月1~30日空气污染情况',
+                    left: 'center'
+                    //top: '1%'
+                },
+                // 提示框组件
+                // tooltip: {
+                //     trigger: 'axis'//触发方式-坐标轴触发，即鼠标放到坐标轴上就显示
+                // },
+                tooltip: {
+                    backgroundColor: ['rgba(255,255,255,0.7)'],
+                    formatter: function (obj) {
+                        var value = obj.value;
+                        return '<div style="border-bottom: 1px solid rgba(255,255,255,.3); font-size: 18px;padding-bottom: 7px;margin-bottom: 7px">'
+                            + obj.seriesName + ': ' + value[0] + '：'
+                            + value[11] + value[10]
+                            + '</div>'
+                            + schema[1].text + '：' + value[3] + '<br>'
+                            + schema[2].text + '：' + value[4] + '<br>'
+                            + schema[3].text + '：' + value[5] + '<br>'
+                            + schema[4].text + '：' + value[6] + '<br>'
+                            + schema[5].text + '：' + value[7] + '<br>'
+                            + schema[6].text + '：' + value[8] + '<br>'
+                            + schema[7].text + '：' + value[9] + '<br>';
+                    }
+                },
+                // tooltip: {
+                //     trigger: 'axis',
+                //     formatter: function (parmater) {
+                //         var vs = [];
+                //         for (var i = 0; i < jsonObj.length; i++) {
+                //             vs = Time[i] + '<br>'
+                //                 + Jiancezhan[i] + '<br>'
+                //                 + Major_pollutant[i] + '<br>'
+                //                 + Air_class[i] + '<br>'
+                //                 + container.AQI[i] + '<br>'
+                //                 + container.SO2[i] + '<br>'
+                //                 + container.NO2[i] + '<br>'
+                //                 + container.CO[i] + '<br>'
+                //                 + container.O3[i] + '<br>'
+                //                 + container.PM2_5[i] + '<br>'
+                //                 + container.PM10[i] + '<br>';
+                //         }
+                //         return vs;
+                //     }
+                // },
+                //数据区域缩放
+                dataZoom: [{
+                    type: 'inside',//缩放类型为内置型，能够通过鼠标滚轴来缩放
+                    start: 0,
+                    end: 10
+                }, {
+                    start: 0,
+                    end: 10,
+                    //handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                    handleSize: '80%',
+                    handleStyle: {
+                        color: '#fff',
+                        shadowBlur: 3,
+                        shadowColor: 'rgba(0, 0, 0, 0.6)',
+                        shadowOffsetX: 2,
+                        shadowOffsetY: 2
+                    },
+                    bottom: '3%'
+                }],
+                //图例
+                legend: {
+                    right: '2%',
+                    bottom: '15%',
+                    orient: 'vertical',
+                    data: ['马坡岭', '湖南中医药大学', '经开区环保局', '天心区环保局', '火车新站', '高开区环保局', '湖南师范大学', '伍家岭', '雨花区环保局', '沙坪']
+                },
+                //网格配置，控制线形图 柱状图 图表大小
+                grid: {
+                    //show: false
+                    left: '5%',
+                    right: '15%',
+                    top: '5%',
+                    bottom: '10%',
+                    containLabel: true//是否显示刻度标签，true就显示
+                },
+                //工具箱组件，可以另存为图片等功能，即下载按钮
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    //show: false,
+                    name: '时间',
+                    nameLocation: 'middle',
+                    nameGap: 25,
+                    type: 'category',
+                    boundaryGap: false,
+                    data: Time
+                },
+                yAxis: {
+                    name: 'AQI',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    type: 'value',
+                    //min: 300,
+                    //max: 550
+                },
+                //各条线
+
+                series: [
+                    {
+                        name: '高开区环保局',
+                        type: 'line',
+                        smooth: true,
+                        // 去掉折线上的小圆点
+                        symbol: 'none',
+                        // ？是否启用图例 hover 时的联动高亮 - 没变化
+                        legendHoverLink: true,
+                        data: gaokaiqu.AQI
+                    },
+                    // {
+                    //     name: '湖南中医药大学',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '经开区环保局',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '天心区环保局',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '火车新站',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '高开区环保局',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '湖南师范大学',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '伍家岭',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '雨花区环保局',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                    // {
+                    //     name: '沙坪',
+                    //     type: 'line',
+                    //     smooth: true,
+                    //     // 去掉折线上的小圆点
+                    //     symbol: 'none',
+                    //     data: container.AQI
+                    // },
+                ]
+            };
+            ;
+            // 使用刚指定的配置项和数据显示图表。
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
+        }
+    </script>
+</body>
+
+</html>
